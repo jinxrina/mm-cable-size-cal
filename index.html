@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MM Wire/Cable Size Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3a86ff;
+            --primary-dark: #2970e6;
+            --secondary-color: #6c757d;
+            --secondary-dark: #5a6268;
+            --accent-color: #ff9f1c;
+            --accent-rgb: 255, 159, 28;
+            --text-color: #333;
+            --text-color-secondary: #666;
+            --section-bg: #fff;
+            --input-bg: #f9fafb;
+            --border-color: #e2e8f0;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --result-bg: #f8fafc;
+            --success-color: #10b981;
+            --success-dark: #0e9f6e;
+            --error-color: #ef4444;
+            --error-rgb: 239, 68, 68;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Wire Sizing Section Styles */
+        #wire-sizing {
+            background-color: var(--section-bg);
+            box-shadow: var(--card-shadow);
+            border-radius: 10px;
+            margin-bottom: 25px;
+            padding: 25px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        #wire-sizing .section-title {
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        #wire-sizing .section-title i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+
+        #wire-sizing .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        #wire-sizing .form-group {
+            margin-bottom: 18px;
+        }
+
+        #wire-sizing label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        #wire-sizing input[type="number"],
+        #wire-sizing select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #wire-sizing input[type="number"]:focus,
+        #wire-sizing select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+            outline: none;
+        }
+
+        #wire-sizing .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        #wire-sizing .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        #wire-sizing .radio-option input {
+            margin-right: 8px;
+        }
+
+        #wire-sizing .button-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 25px;
+        }
+
+        #wire-sizing .button {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        #wire-sizing .button i {
+            margin-right: 8px;
+        }
+
+        #wire-sizing .button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        #wire-sizing .button-reset {
+            background-color: var(--secondary-color);
+        }
+
+        #wire-sizing .button-reset:hover {
+            background-color: var(--secondary-dark);
+        }
+
+        #wire-sizing .result-container {
+            background-color: var(--result-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+            border-left: 4px solid var(--accent-color);
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        #wire-sizing .result-container.active {
+            display: block;
+        }
+
+        #wire-sizing .result-title {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        #wire-sizing .result-title i {
+            margin-right: 10px;
+        }
+
+        #wire-sizing .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        #wire-sizing .result-item:last-child {
+            border-bottom: none;
+        }
+
+        #wire-sizing .result-label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        #wire-sizing .result-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        #wire-sizing .accordion {
+            margin-top: 20px;
+        }
+
+        #wire-sizing .accordion-item {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        #wire-sizing .accordion-header {
+            background-color: var(--input-bg);
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        #wire-sizing .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        #wire-sizing .accordion-item.active .accordion-content {
+            max-height: 300px;
+        }
+
+        #wire-sizing .accordion-body {
+            padding: 15px;
+            color: var(--text-color-secondary);
+            font-size: 15px;
+        }
+
+        #wire-sizing .sg-regulation {
+            font-style: italic;
+            background-color: rgba(var(--accent-rgb), 0.1);
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        /* Animation for pulse effect on calculate button */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        #wire-sizing .pulse-animation {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        /* Animation for fading in */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--success-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 1000;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .save-button {
+            margin-top: 15px;
+            background-color: var(--success-color) !important;
+        }
+
+        .save-button:hover {
+            background-color: var(--success-dark) !important;
+        }
+
+        /* Invalid input styling */
+        input.invalid {
+            border-color: var(--error-color) !important;
+            background-color: rgba(var(--error-rgb), 0.05);
+        }
+
+        /* Responsive styles for mobile */
+        @media (max-width: 768px) {
+            #wire-sizing .two-columns {
+                grid-template-columns: 1fr;
+            }
+            
+            #wire-sizing .button-row {
+                flex-direction: column;
+            }
+            
+            #wire-sizing .result-item {
+                flex-direction: column;
+            }
+            
+            #wire-sizing .result-value {
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Wire Sizing Section -->
+    <div class="calculation-section active" id="wire-sizing">
+        <h2 class="section-title"><i class="fas fa-plug"></i> MM Wire/Cable Size Calculator</h2>
+        <div class="two-columns">
+            <div>
+                <div class="form-group">
+                    <label for="application-type">Application Type</label>
+                    <select id="application-type">
+                        <option value="residential">Residential</option>
+                        <option value="commercial">Commercial</option>
+                        <option value="office">Office</option>
+                        <option value="school">School</option>
+                        <option value="industrial">Industrial</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="load-current">Load Current (A)</label>
+                    <input type="number" id="load-current" min="0" step="0.1" placeholder="Enter load current">
+                </div>
+                
+                <div class="form-group">
+                    <label for="voltage">Voltage (V)</label>
+                    <select id="voltage">
+                        <option value="230">230V (Single Phase)</option>
+                        <option value="400">400V (Three Phase)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cable-length">Cable Length (m)</label>
+                    <input type="number" id="cable-length" min="1" step="1" placeholder="Enter cable length">
+                </div>
+            </div>
+            
+            <div>
+                <div class="form-group">
+                    <label for="installation-method">Installation Method</label>
+                    <select id="installation-method">
+                        <option value="conduit">Enclosed in Conduit</option>
+                        <option value="trunking">Cable Trunking</option>
+                        <option value="direct">Direct Burial</option>
+                        <option value="free-air">Free Air/Cable Tray</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ambient-temp">Ambient Temperature (°C)</label>
+                    <input type="number" id="ambient-temp" value="30" min="0" max="60" step="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="voltage-drop">Maximum Allowable Voltage Drop (%)</label>
+                    <input type="number" id="voltage-drop" value="2.5" min="0" max="10" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="power-factor">Power Factor</label>
+                    <input type="number" id="power-factor" value="0.85" min="0.5" max="1" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label>Conductor Material</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="conductor" value="copper" checked>
+                            Copper
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="conductor" value="aluminum">
+                            Aluminum
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="button-row">
+            <button class="button" id="calculate-wire">
+                <i class="fas fa-calculator"></i> Calculate
+            </button>
+            <button class="button button-reset" id="reset-wire">
+                <i class="fas fa-redo"></i> Reset
+            </button>
+        </div>
+        
+        <div class="result-container" id="wire-sizing-result">
+            <h3 class="result-title"><i class="fas fa-check-circle"></i> Calculation Results</h3>
+            <div class="result-item">
+                <span class="result-label">Minimum Cable Size:</span>
+                <span class="result-value" id="cable-size">6.0 mm²</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Current Carrying Capacity:</span>
+                <span class="result-value" id="current-capacity">45 A</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Voltage Drop:</span>
+                <span class="result-value" id="actual-voltage-drop">1.8 %</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Voltage Drop (V):</span>
+                <span class="result-value" id="actual-voltage-drop-volts">4.14 V</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Recommended Cable Type:</span>
+                <span class="result-value" id="cable-type">PVC Insulated, 3-core (P+N+E)</span>
+            </div>
+            
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Singapore Regulations Reference</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>According to Singapore's Code of Practice CP5:2018:</p>
+                            <ul>
+                                <li>For residential installations, the maximum voltage drop should not exceed 2.5% of nominal voltage.</li>
+                                <li>All cables must be sized to carry the design current while considering correction factors for ambient temperature and grouping.</li>
+                                <li>Protective devices must be selected to protect against overload and short circuit conditions.</li>
+                            </ul>
+                            <p class="sg-regulation">
+                                "The nominal cross-sectional area of conductors shall be not less than the values specified in SS 638." - CP5:2018 Section 5.1.2
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Wire Sizing Calculator
+        const calculateWireBtn = document.getElementById('calculate-wire');
+        const resetWireBtn = document.getElementById('reset-wire');
+        const wireSizingResult = document.getElementById('wire-sizing-result');
+
+        calculateWireBtn.addEventListener('click', () => {
+            // Add pulse animation to button
+            calculateWireBtn.classList.add('pulse-animation');
+            
+            // Simulate calculation delay
+            setTimeout(() => {
+                // Show results
+                wireSizingResult.classList.add('active');
+                
+                // Remove pulse animation
+                calculateWireBtn.classList.remove('pulse-animation');
+                
+                // Get input values
+                const loadCurrent = parseFloat(document.getElementById('load-current').value) || 20;
+                const appType = document.getElementById('application-type').value;
+                const cableLength = parseFloat(document.getElementById('cable-length').value) || 30;
+                const installMethod = document.getElementById('installation-method').value;
+                const voltage = parseFloat(document.getElementById('voltage').value) || 230;
+                const powerFactor = parseFloat(document.getElementById('power-factor').value) || 0.85;
+                const conductor = document.querySelector('input[name="conductor"]:checked').value;
+                
+                // Update result fields
+                let cableSize, currentCapacity, voltDrop, voltDropV, cableType;
+                
+                // Resistivity values in ohm-mm²/m
+                const resistivity = {
+                    "copper": 0.0172,
+                    "aluminum": 0.0282
+                };
+                
+                // Resistance values for copper in ohm/m for different cable sizes
+                const resistanceValues = {
+                    "1.0": 0.0172,
+                    "1.5": 0.0115,
+                    "2.5": 0.0069,
+                    "4.0": 0.0043,
+                    "6.0": 0.0029,
+                    "10.0": 0.0017,
+                    "16.0": 0.0011,
+                    "25.0": 0.0007,
+                    "35.0": 0.0005,
+                    "50.0": 0.00035,
+                    "70.0": 0.00025,
+                    "95.0": 0.00018,
+                    "120.0": 0.00015,
+                    "150.0": 0.00012
+                };
+                
+                // For aluminum, resistance is approximately 1.64 times that of copper
+                const alMultiplier = 1.64;
+                
+                // Calculate voltage drop based on formula: V_drop = 2 * I * L * R * cos(phi) / 1000 (for single phase)
+                // For three phase: V_drop = sqrt(3) * I * L * R * cos(phi) / 1000
+                function calculateVoltageDrop(current, length, cableSize, conductorType, volt, pf) {
+                    const isThreePhase = volt === 400;
+                    const resistance = conductorType === "copper" ? 
+                        resistanceValues[cableSize] : 
+                        resistanceValues[cableSize] * alMultiplier;
+                    
+                    if (isThreePhase) {
+                        return Math.sqrt(3) * current * length * resistance * pf / 1000;
+                    } else {
+                        return 2 * current * length * resistance * pf / 1000;
+                    }
+                }
+                
+                // Determine cable size based on current
+                if (loadCurrent <= 13) {
+                    cableSize = "1.5";
+                    currentCapacity = "17.5";
+                } else if (loadCurrent <= 18) {
+                    cableSize = "2.5";
+                    currentCapacity = "24";
+                } else if (loadCurrent <= 25) {
+                    cableSize = "4.0";
+                    currentCapacity = "32";
+                } else if (loadCurrent <= 32) {
+                    cableSize = "6.0";
+                    currentCapacity = "41";
+                } else if (loadCurrent <= 50) {
+                    cableSize = "10.0";
+                    currentCapacity = "57";
+                } else if (loadCurrent <= 68) {
+                    cableSize = "16.0";
+                    currentCapacity = "76";
+                } else if (loadCurrent <= 89) {
+                    cableSize = "25.0";
+                    currentCapacity = "101";
+                } else if (loadCurrent <= 110) {
+                    cableSize = "35.0";
+                    currentCapacity = "125";
+                } else if (loadCurrent <= 134) {
+                    cableSize = "50.0";
+                    currentCapacity = "151";
+                } else if (loadCurrent <= 171) {
+                    cableSize = "70.0";
+                    currentCapacity = "192";
+                } else if (loadCurrent <= 207) {
+                    cableSize = "95.0";
+                    currentCapacity = "232";
+                } else {
+                    cableSize = "120.0";
+                    currentCapacity = "269";
+                }
+                
+                // Calculate voltage drop
+                voltDropV = calculateVoltageDrop(loadCurrent, cableLength, cableSize, conductor, voltage, powerFactor);
+                voltDrop = (voltDropV / voltage * 100).toFixed(2);
+                
+                // Check if voltage drop exceeds maximum allowed
+                const maxVoltDrop = parseFloat(document.getElementById('voltage-drop').value) || 2.5;
+                
+                // If voltage drop exceeds maximum, find a larger cable size that meets the criteria
+                if (parseFloat(voltDrop) > maxVoltDrop) {
+                    const cablesizes = ["1.0", "1.5", "2.5", "4.0", "6.0", "10.0", "16.0", "25.0", "35.0", "50.0", "70.0", "95.0", "120.0", "150.0"];
+                    for (let i = cablesizes.indexOf(cableSize); i < cablesizes.length; i++) {
+                        const newSize = cablesizes[i];
+                        const newVoltDropV = calculateVoltageDrop(loadCurrent, cableLength, newSize, conductor, voltage, powerFactor);
+                        const newVoltDrop = (newVoltDropV / voltage * 100).toFixed(2);
+                        
+                        if (parseFloat(newVoltDrop) <= maxVoltDrop) {
+                            cableSize = newSize;
+                            voltDropV = newVoltDropV;
+                            voltDrop = newVoltDrop;
+                            break;
+                        }
+                    }
+                }
+                
+                // Determine cable type
+                if (voltage === 230) {
+                    cableType = "PVC Insulated, 3-core (P+N+E)";
+                } else {
+                    cableType = "PVC Insulated, 4-core (3P+E)";
+                }
+                
+                document.getElementById('cable-size').textContent = `${cableSize} mm²`;
+                document.getElementById('current-capacity').textContent = `${currentCapacity} A`;
+                document.getElementById('actual-voltage-drop').textContent = `${voltDrop} %`;
+                document.getElementById('actual-voltage-drop-volts').textContent = `${voltDropV.toFixed(2)} V`;
+                document.getElementById('cable-type').textContent = cableType;
+            }, 800);
+        });
+
+        resetWireBtn.addEventListener('click', () => {
+            // Reset form fields
+            document.getElementById('load-current').value = '';
+            document.getElementById('cable-length').value = '';
+            document.getElementById('ambient-temp').value = '30';
+            document.getElementById('voltage-drop').value = '2.5';
+            document.getElementById('power-factor').value = '0.85';
+            
+            // Hide results
+            wireSizingResult.classList.remove('active');
+        });
+
+        // Accordion functionality for the wire sizing section
+        document.querySelectorAll('#wire-sizing .accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                item.classList.toggle('active');
+                
+                // Toggle icon
+                const icon = header.querySelector('i');
+                if (item.classList.contains('active')) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                } else {
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                }
+            });
+        });
+
+        // Add validation to the wire sizing form
+        document.getElementById('load-current').addEventListener('input', validateInput);
+        document.getElementById('cable-length').addEventListener('input', validateInput);
+
+        function validateInput(e) {
+            const input = e.target;
+            const value = parseFloat(input.value);
+            
+            if (isNaN(value) || value <= 0) {
+                input.classList.add('invalid');
+            } else {
+                input.classList.remove('invalid');
+            }
+        }
+
+        // Add ability to save calculation results
+        document.getElementById('wire-sizing-result').addEventListener('animationend', function() {
+            // Add a save button to the results section if it doesn't exist
+            if (!document.getElementById('save-wire-result')) {
+                const saveBtn = document.createElement('button');
+                saveBtn.id = 'save-wire-result';
+                saveBtn.className = 'button save-button';
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Result';
+                
+                this.appendChild(saveBtn);
+                
+                saveBtn.addEventListener('click', function() {
+                    // Create a result object
+                    const result = {
+                        loadCurrent: document.getElementById('load-current').value,
+                        voltage: document.getElementById('voltage').value,
+                        cableLength: document.getElementById('cable-length').value,
+                        cableSize: document.getElementById('cable-size').textContent,
+                        currentCapacity: document.getElementById('current-capacity').textContent,
+                        voltageDropPercentage: document.getElementById('actual-voltage-drop').textContent,
+                        voltageDropVolts: document.getElementById('actual-voltage-drop-volts').textContent,
+                        cableType: document.getElementById('cable-type').textContent,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    // Save to local storage
+                    let savedResults = JSON.parse(localStorage.getItem('wireSizingResults') || '[]');
+                    savedResults.push(result);
+                    localStorage.setItem('wireSizingResults', JSON.stringify(savedResults));
+                    
+                    // Show confirmation
+                    const toast = document.createElement('div');
+                    toast.className = 'toast-notification';
+                    toast.textContent = 'Result saved successfully!';
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        toast.classList.add('show');
+                        setTimeout(() => {
+                            toast.classList.remove('show');
+                            setTimeout(() => {
+                                document.body.removeChild(toast);
+                            }, 300);
+                        }, 2000);
+                    }, 100);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MM Wire/Cable Size Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3a86ff;
+            --primary-dark: #2970e6;
+            --secondary-color: #6c757d;
+            --secondary-dark: #5a6268;
+            --accent-color: #ff9f1c;
+            --accent-rgb: 255, 159, 28;
+            --text-color: #333;
+            --text-color-secondary: #666;
+            --section-bg: #fff;
+            --input-bg: #f9fafb;
+            --border-color: #e2e8f0;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --result-bg: #f8fafc;
+            --success-color: #10b981;
+            --success-dark: #0e9f6e;
+            --error-color: #ef4444;
+            --error-rgb: 239, 68, 68;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Wire Sizing Section Styles */
+        #wire-sizing {
+            background-color: var(--section-bg);
+            box-shadow: var(--card-shadow);
+            border-radius: 10px;
+            margin-bottom: 25px;
+            padding: 25px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        #wire-sizing .section-title {
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        #wire-sizing .section-title i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+
+        #wire-sizing .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        #wire-sizing .form-group {
+            margin-bottom: 18px;
+        }
+
+        #wire-sizing label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        #wire-sizing input[type="number"],
+        #wire-sizing select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #wire-sizing input[type="number"]:focus,
+        #wire-sizing select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+            outline: none;
+        }
+
+        #wire-sizing .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        #wire-sizing .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        #wire-sizing .radio-option input {
+            margin-right: 8px;
+        }
+
+        #wire-sizing .button-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 25px;
+        }
+
+        #wire-sizing .button {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        #wire-sizing .button i {
+            margin-right: 8px;
+        }
+
+        #wire-sizing .button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        #wire-sizing .button-reset {
+            background-color: var(--secondary-color);
+        }
+
+        #wire-sizing .button-reset:hover {
+            background-color: var(--secondary-dark);
+        }
+
+        #wire-sizing .result-container {
+            background-color: var(--result-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+            border-left: 4px solid var(--accent-color);
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        #wire-sizing .result-container.active {
+            display: block;
+        }
+
+        #wire-sizing .result-title {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        #wire-sizing .result-title i {
+            margin-right: 10px;
+        }
+
+        #wire-sizing .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        #wire-sizing .result-item:last-child {
+            border-bottom: none;
+        }
+
+        #wire-sizing .result-label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        #wire-sizing .result-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        #wire-sizing .accordion {
+            margin-top: 20px;
+        }
+
+        #wire-sizing .accordion-item {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        #wire-sizing .accordion-header {
+            background-color: var(--input-bg);
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        #wire-sizing .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        #wire-sizing .accordion-item.active .accordion-content {
+            max-height: 300px;
+        }
+
+        #wire-sizing .accordion-body {
+            padding: 15px;
+            color: var(--text-color-secondary);
+            font-size: 15px;
+        }
+
+        #wire-sizing .sg-regulation {
+            font-style: italic;
+            background-color: rgba(var(--accent-rgb), 0.1);
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        /* Animation for pulse effect on calculate button */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        #wire-sizing .pulse-animation {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        /* Animation for fading in */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--success-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 1000;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .save-button {
+            margin-top: 15px;
+            background-color: var(--success-color) !important;
+        }
+
+        .save-button:hover {
+            background-color: var(--success-dark) !important;
+        }
+
+        /* Invalid input styling */
+        input.invalid {
+            border-color: var(--error-color) !important;
+            background-color: rgba(var(--error-rgb), 0.05);
+        }
+
+        /* Responsive styles for mobile */
+        @media (max-width: 768px) {
+            #wire-sizing .two-columns {
+                grid-template-columns: 1fr;
+            }
+            
+            #wire-sizing .button-row {
+                flex-direction: column;
+            }
+            
+            #wire-sizing .result-item {
+                flex-direction: column;
+            }
+            
+            #wire-sizing .result-value {
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Wire Sizing Section -->
+    <div class="calculation-section active" id="wire-sizing">
+        <h2 class="section-title"><i class="fas fa-plug"></i> MM Wire/Cable Size Calculator</h2>
+        <div class="two-columns">
+            <div>
+                <div class="form-group">
+                    <label for="application-type">Application Type</label>
+                    <select id="application-type">
+                        <option value="residential">Residential</option>
+                        <option value="commercial">Commercial</option>
+                        <option value="office">Office</option>
+                        <option value="school">School</option>
+                        <option value="industrial">Industrial</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="load-current">Load Current (A)</label>
+                    <input type="number" id="load-current" min="0" step="0.1" placeholder="Enter load current">
+                </div>
+                
+                <div class="form-group">
+                    <label for="voltage">Voltage (V)</label>
+                    <select id="voltage">
+                        <option value="230">230V (Single Phase)</option>
+                        <option value="400">400V (Three Phase)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cable-length">Cable Length (m)</label>
+                    <input type="number" id="cable-length" min="1" step="1" placeholder="Enter cable length">
+                </div>
+            </div>
+            
+            <div>
+                <div class="form-group">
+                    <label for="installation-method">Installation Method</label>
+                    <select id="installation-method">
+                        <option value="conduit">Enclosed in Conduit</option>
+                        <option value="trunking">Cable Trunking</option>
+                        <option value="direct">Direct Burial</option>
+                        <option value="free-air">Free Air/Cable Tray</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ambient-temp">Ambient Temperature (°C)</label>
+                    <input type="number" id="ambient-temp" value="30" min="0" max="60" step="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="voltage-drop">Maximum Allowable Voltage Drop (%)</label>
+                    <input type="number" id="voltage-drop" value="2.5" min="0" max="10" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="power-factor">Power Factor</label>
+                    <input type="number" id="power-factor" value="0.85" min="0.5" max="1" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label>Conductor Material</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="conductor" value="copper" checked>
+                            Copper
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="conductor" value="aluminum">
+                            Aluminum
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="button-row">
+            <button class="button" id="calculate-wire">
+                <i class="fas fa-calculator"></i> Calculate
+            </button>
+            <button class="button button-reset" id="reset-wire">
+                <i class="fas fa-redo"></i> Reset
+            </button>
+        </div>
+        
+        <div class="result-container" id="wire-sizing-result">
+            <h3 class="result-title"><i class="fas fa-check-circle"></i> Calculation Results</h3>
+            <div class="result-item">
+                <span class="result-label">Minimum Cable Size:</span>
+                <span class="result-value" id="cable-size">6.0 mm²</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Current Carrying Capacity:</span>
+                <span class="result-value" id="current-capacity">45 A</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Voltage Drop:</span>
+                <span class="result-value" id="actual-voltage-drop">1.8 %</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Voltage Drop (V):</span>
+                <span class="result-value" id="actual-voltage-drop-volts">4.14 V</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Recommended Cable Type:</span>
+                <span class="result-value" id="cable-type">PVC Insulated, 3-core (P+N+E)</span>
+            </div>
+            
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <span>Singapore Regulations Reference</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p>According to Singapore's Code of Practice CP5:2018:</p>
+                            <ul>
+                                <li>For residential installations, the maximum voltage drop should not exceed 2.5% of nominal voltage.</li>
+                                <li>All cables must be sized to carry the design current while considering correction factors for ambient temperature and grouping.</li>
+                                <li>Protective devices must be selected to protect against overload and short circuit conditions.</li>
+                            </ul>
+                            <p class="sg-regulation">
+                                "The nominal cross-sectional area of conductors shall be not less than the values specified in SS 638." - CP5:2018 Section 5.1.2
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Wire Sizing Calculator
+        const calculateWireBtn = document.getElementById('calculate-wire');
+        const resetWireBtn = document.getElementById('reset-wire');
+        const wireSizingResult = document.getElementById('wire-sizing-result');
+
+        calculateWireBtn.addEventListener('click', () => {
+            // Add pulse animation to button
+            calculateWireBtn.classList.add('pulse-animation');
+            
+            // Simulate calculation delay
+            setTimeout(() => {
+                // Show results
+                wireSizingResult.classList.add('active');
+                
+                // Remove pulse animation
+                calculateWireBtn.classList.remove('pulse-animation');
+                
+                // Get input values
+                const loadCurrent = parseFloat(document.getElementById('load-current').value) || 20;
+                const appType = document.getElementById('application-type').value;
+                const cableLength = parseFloat(document.getElementById('cable-length').value) || 30;
+                const installMethod = document.getElementById('installation-method').value;
+                const voltage = parseFloat(document.getElementById('voltage').value) || 230;
+                const powerFactor = parseFloat(document.getElementById('power-factor').value) || 0.85;
+                const conductor = document.querySelector('input[name="conductor"]:checked').value;
+                
+                // Update result fields
+                let cableSize, currentCapacity, voltDrop, voltDropV, cableType;
+                
+                // Resistivity values in ohm-mm²/m
+                const resistivity = {
+                    "copper": 0.0172,
+                    "aluminum": 0.0282
+                };
+                
+                // Resistance values for copper in ohm/m for different cable sizes
+                const resistanceValues = {
+                    "1.0": 0.0172,
+                    "1.5": 0.0115,
+                    "2.5": 0.0069,
+                    "4.0": 0.0043,
+                    "6.0": 0.0029,
+                    "10.0": 0.0017,
+                    "16.0": 0.0011,
+                    "25.0": 0.0007,
+                    "35.0": 0.0005,
+                    "50.0": 0.00035,
+                    "70.0": 0.00025,
+                    "95.0": 0.00018,
+                    "120.0": 0.00015,
+                    "150.0": 0.00012
+                };
+                
+                // For aluminum, resistance is approximately 1.64 times that of copper
+                const alMultiplier = 1.64;
+                
+                // Calculate voltage drop based on formula: V_drop = 2 * I * L * R * cos(phi) / 1000 (for single phase)
+                // For three phase: V_drop = sqrt(3) * I * L * R * cos(phi) / 1000
+                function calculateVoltageDrop(current, length, cableSize, conductorType, volt, pf) {
+                    const isThreePhase = volt === 400;
+                    const resistance = conductorType === "copper" ? 
+                        resistanceValues[cableSize] : 
+                        resistanceValues[cableSize] * alMultiplier;
+                    
+                    if (isThreePhase) {
+                        return Math.sqrt(3) * current * length * resistance * pf / 1000;
+                    } else {
+                        return 2 * current * length * resistance * pf / 1000;
+                    }
+                }
+                
+                // Determine cable size based on current
+                if (loadCurrent <= 13) {
+                    cableSize = "1.5";
+                    currentCapacity = "17.5";
+                } else if (loadCurrent <= 18) {
+                    cableSize = "2.5";
+                    currentCapacity = "24";
+                } else if (loadCurrent <= 25) {
+                    cableSize = "4.0";
+                    currentCapacity = "32";
+                } else if (loadCurrent <= 32) {
+                    cableSize = "6.0";
+                    currentCapacity = "41";
+                } else if (loadCurrent <= 50) {
+                    cableSize = "10.0";
+                    currentCapacity = "57";
+                } else if (loadCurrent <= 68) {
+                    cableSize = "16.0";
+                    currentCapacity = "76";
+                } else if (loadCurrent <= 89) {
+                    cableSize = "25.0";
+                    currentCapacity = "101";
+                } else if (loadCurrent <= 110) {
+                    cableSize = "35.0";
+                    currentCapacity = "125";
+                } else if (loadCurrent <= 134) {
+                    cableSize = "50.0";
+                    currentCapacity = "151";
+                } else if (loadCurrent <= 171) {
+                    cableSize = "70.0";
+                    currentCapacity = "192";
+                } else if (loadCurrent <= 207) {
+                    cableSize = "95.0";
+                    currentCapacity = "232";
+                } else {
+                    cableSize = "120.0";
+                    currentCapacity = "269";
+                }
+                
+                // Calculate voltage drop
+                voltDropV = calculateVoltageDrop(loadCurrent, cableLength, cableSize, conductor, voltage, powerFactor);
+                voltDrop = (voltDropV / voltage * 100).toFixed(2);
+                
+                // Check if voltage drop exceeds maximum allowed
+                const maxVoltDrop = parseFloat(document.getElementById('voltage-drop').value) || 2.5;
+                
+                // If voltage drop exceeds maximum, find a larger cable size that meets the criteria
+                if (parseFloat(voltDrop) > maxVoltDrop) {
+                    const cablesizes = ["1.0", "1.5", "2.5", "4.0", "6.0", "10.0", "16.0", "25.0", "35.0", "50.0", "70.0", "95.0", "120.0", "150.0"];
+                    for (let i = cablesizes.indexOf(cableSize); i < cablesizes.length; i++) {
+                        const newSize = cablesizes[i];
+                        const newVoltDropV = calculateVoltageDrop(loadCurrent, cableLength, newSize, conductor, voltage, powerFactor);
+                        const newVoltDrop = (newVoltDropV / voltage * 100).toFixed(2);
+                        
+                        if (parseFloat(newVoltDrop) <= maxVoltDrop) {
+                            cableSize = newSize;
+                            voltDropV = newVoltDropV;
+                            voltDrop = newVoltDrop;
+                            break;
+                        }
+                    }
+                }
+                
+                // Determine cable type
+                if (voltage === 230) {
+                    cableType = "PVC Insulated, 3-core (P+N+E)";
+                } else {
+                    cableType = "PVC Insulated, 4-core (3P+E)";
+                }
+                
+                document.getElementById('cable-size').textContent = `${cableSize} mm²`;
+                document.getElementById('current-capacity').textContent = `${currentCapacity} A`;
+                document.getElementById('actual-voltage-drop').textContent = `${voltDrop} %`;
+                document.getElementById('actual-voltage-drop-volts').textContent = `${voltDropV.toFixed(2)} V`;
+                document.getElementById('cable-type').textContent = cableType;
+            }, 800);
+        });
+
+        resetWireBtn.addEventListener('click', () => {
+            // Reset form fields
+            document.getElementById('load-current').value = '';
+            document.getElementById('cable-length').value = '';
+            document.getElementById('ambient-temp').value = '30';
+            document.getElementById('voltage-drop').value = '2.5';
+            document.getElementById('power-factor').value = '0.85';
+            
+            // Hide results
+            wireSizingResult.classList.remove('active');
+        });
+
+        // Accordion functionality for the wire sizing section
+        document.querySelectorAll('#wire-sizing .accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                item.classList.toggle('active');
+                
+                // Toggle icon
+                const icon = header.querySelector('i');
+                if (item.classList.contains('active')) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                } else {
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                }
+            });
+        });
+
+        // Add validation to the wire sizing form
+        document.getElementById('load-current').addEventListener('input', validateInput);
+        document.getElementById('cable-length').addEventListener('input', validateInput);
+
+        function validateInput(e) {
+            const input = e.target;
+            const value = parseFloat(input.value);
+            
+            if (isNaN(value) || value <= 0) {
+                input.classList.add('invalid');
+            } else {
+                input.classList.remove('invalid');
+            }
+        }
+
+        // Add ability to save calculation results
+        document.getElementById('wire-sizing-result').addEventListener('animationend', function() {
+            // Add a save button to the results section if it doesn't exist
+            if (!document.getElementById('save-wire-result')) {
+                const saveBtn = document.createElement('button');
+                saveBtn.id = 'save-wire-result';
+                saveBtn.className = 'button save-button';
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Result';
+                
+                this.appendChild(saveBtn);
+                
+                saveBtn.addEventListener('click', function() {
+                    // Create a result object
+                    const result = {
+                        loadCurrent: document.getElementById('load-current').value,
+                        voltage: document.getElementById('voltage').value,
+                        cableLength: document.getElementById('cable-length').value,
+                        cableSize: document.getElementById('cable-size').textContent,
+                        currentCapacity: document.getElementById('current-capacity').textContent,
+                        voltageDropPercentage: document.getElementById('actual-voltage-drop').textContent,
+                        voltageDropVolts: document.getElementById('actual-voltage-drop-volts').textContent,
+                        cableType: document.getElementById('cable-type').textContent,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    // Save to local storage
+                    let savedResults = JSON.parse(localStorage.getItem('wireSizingResults') || '[]');
+                    savedResults.push(result);
+                    localStorage.setItem('wireSizingResults', JSON.stringify(savedResults));
+                    
+                    // Show confirmation
+                    const toast = document.createElement('div');
+                    toast.className = 'toast-notification';
+                    toast.textContent = 'Result saved successfully!';
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        toast.classList.add('show');
+                        setTimeout(() => {
+                            toast.classList.remove('show');
+                            setTimeout(() => {
+                                document.body.removeChild(toast);
+                            }, 300);
+                        }, 2000);
+                    }, 100);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
